@@ -44,10 +44,7 @@ fun NavGraph(navController: NavHostController) {
         composable(route = Screen.LMSPortal.route) {
             WebViewScreen(
                 title = "LMS Portal",
-                url = "http://era.mkcl.org/lms/#/15477477481473922139",
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
+                url = "http://era.mkcl.org/lms/#/15477477481473922139"
             )
         }
 
@@ -55,10 +52,7 @@ fun NavGraph(navController: NavHostController) {
         composable(route = Screen.MobileAppDev.route) {
             WebViewScreen(
                 title = "Mobile App Development",
-                url = "https://eranx.mkcl.org/learner/login",
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
+                url = "https://eranx.mkcl.org/learner/login"
             )
         }
 
@@ -66,10 +60,7 @@ fun NavGraph(navController: NavHostController) {
         composable(route = Screen.AERPLogin.route) {
             WebViewScreen(
                 title = "AERP Login",
-                url = "https://aerp.kkwagh.edu.in",
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
+                url = "https://aerp.kkwagh.edu.in"
             )
         }
     }

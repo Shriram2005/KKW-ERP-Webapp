@@ -49,7 +49,7 @@ fun HomeScreen(
             Image(
                 painter = painterResource(id = R.drawable.college_logo),
                 contentDescription = "College Logo",
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(180.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))

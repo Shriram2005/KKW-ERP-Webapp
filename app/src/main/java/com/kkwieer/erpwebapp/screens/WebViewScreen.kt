@@ -4,8 +4,6 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,60 +13,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 
+private const val DESKTOP_USER_AGENT: String =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebViewScreen(
     title: String,
-    url: String,
-    onNavigateBack: () -> Unit
+    url: String
 ) {
     var webView by remember { mutableStateOf<WebView?>(null) }
     var isDesktopMode by remember { mutableStateOf(false) }
+    var originalUserAgent by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = title,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
         floatingActionButton = {
+            // Desktop/Mobile mode toggle button only
             ExtendedFloatingActionButton(
                 onClick = {
                     isDesktopMode = !isDesktopMode
                     webView?.let { wv ->
+                        val settings = wv.settings
                         if (isDesktopMode) {
-                            // Enable desktop mode
-                            wv.settings.userAgentString =
-                                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-                            wv.settings.useWideViewPort = true
-                            wv.settings.loadWithOverviewMode = true
-                            wv.settings.setSupportZoom(true)
-                            wv.settings.builtInZoomControls = true
-                            wv.settings.displayZoomControls = false
-                            wv.setInitialScale(1)
+                            if (originalUserAgent == null) originalUserAgent =
+                                settings.userAgentString
+                            settings.userAgentString = DESKTOP_USER_AGENT
+                            settings.useWideViewPort = true
+                            settings.loadWithOverviewMode = true
+                            settings.setSupportZoom(true)
+                            settings.builtInZoomControls = true
+                            settings.displayZoomControls = false
+                            // Keep 100% scale; we'll adjust fit after load
                         } else {
-                            // Reset to mobile mode
-                            wv.settings.userAgentString = null
-                            wv.settings.useWideViewPort = true
-                            wv.settings.loadWithOverviewMode = true
+                            settings.userAgentString = originalUserAgent
+                            settings.useWideViewPort = true
+                            settings.loadWithOverviewMode = true
+                            settings.setSupportZoom(true)
+                            settings.builtInZoomControls = true
+                            settings.displayZoomControls = false
                         }
                         wv.reload()
                     }
@@ -100,9 +82,29 @@ fun WebViewScreen(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT
                         )
-                        webViewClient = WebViewClient()
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView, url: String) {
+                                if (isDesktopMode) {
+                                    // Inject desktop-like viewport to trigger desktop layouts
+                                    view.evaluateJavascript(
+                                        """
+                                        (function(){
+                                          var m = document.querySelector('meta[name=viewport]');
+                                          if(!m){ m = document.createElement('meta'); m.name='viewport'; document.head.appendChild(m); }
+                                          m.setAttribute('content','width=1280');
+                                        })();
+                                        """.trimIndent(),
+                                        null
+                                    )
+                                    view.postDelayed({
+                                        // Fit content to screen width after viewport change
+                                        repeat(4) { view.zoomOut() }
+                                    }, 100)
+                                }
+                            }
+                        }
 
-                        // Configure settings for better desktop mode support
+                        // Configure settings for better rendering
                         settings.apply {
                             javaScriptEnabled = true
                             domStorageEnabled = true
@@ -112,12 +114,17 @@ fun WebViewScreen(
                             setSupportZoom(true)
                             builtInZoomControls = true
                             displayZoomControls = false
+                            layoutAlgorithm =
+                                android.webkit.WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
 
                             // Additional settings for better rendering
                             javaScriptCanOpenWindowsAutomatically = true
                             mediaPlaybackRequiresUserGesture = false
                             allowFileAccess = true
                             allowContentAccess = true
+
+                            // Enable mixed content for compatibility
+                            mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                         }
 
                         loadUrl(url)
