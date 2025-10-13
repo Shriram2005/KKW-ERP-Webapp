@@ -3,12 +3,12 @@ package com.kkwieer.erpwebapp.screens
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -20,16 +20,17 @@ private const val DESKTOP_USER_AGENT: String =
 @Composable
 fun WebViewScreen(
     title: String,
-    url: String
+    url: String,
+    onNavigateBack: () -> Unit
 ) {
     var webView by remember { mutableStateOf<WebView?>(null) }
     var isDesktopMode by remember { mutableStateOf(false) }
     var originalUserAgent by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
 
     Scaffold(
         floatingActionButton = {
-            // Desktop/Mobile mode toggle button only
-            ExtendedFloatingActionButton(
+            SmallFloatingActionButton(
                 onClick = {
                     isDesktopMode = !isDesktopMode
                     webView?.let { wv ->
@@ -62,9 +63,8 @@ fun WebViewScreen(
                 }
             ) {
                 Text(
-                    text = if (isDesktopMode) "📱 Mobile" else "💻 Desktop",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = if (isDesktopMode) "📱" else "💻",
+                    fontSize = 18.sp
                 )
             }
         },
@@ -83,7 +83,16 @@ fun WebViewScreen(
                             ViewGroup.LayoutParams.MATCH_PARENT
                         )
                         webViewClient = object : WebViewClient() {
+                            override fun onPageStarted(
+                                view: WebView,
+                                url: String,
+                                favicon: android.graphics.Bitmap?
+                            ) {
+                                isLoading = true
+                                super.onPageStarted(view, url, favicon)
+                            }
                             override fun onPageFinished(view: WebView, url: String) {
+                                isLoading = false
                                 if (isDesktopMode) {
                                     // Inject desktop-like viewport to trigger desktop layouts
                                     view.evaluateJavascript(
@@ -133,6 +142,24 @@ fun WebViewScreen(
                 },
                 modifier = Modifier.fillMaxSize()
             )
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(28.dp))
+                }
+            }
+        }
+    }
+
+    BackHandler {
+        val wv = webView
+        if (wv != null && wv.canGoBack()) {
+            wv.goBack()
+        } else {
+            onNavigateBack()
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.kkwieer.erpwebapp.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kkwieer.erpwebapp.R
+import com.kkwieer.erpwebapp.ui.bounceClick
 
 @Composable
 fun HomeScreen(
@@ -76,7 +77,8 @@ fun HomeScreen(
                 onClick = onNavigateToLMS,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(56.dp)
+                    .bounceClick(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color(0xFF1976D2)
@@ -102,7 +104,8 @@ fun HomeScreen(
                 onClick = onNavigateToMobileAppDev,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(56.dp)
+                    .bounceClick(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color(0xFF1976D2)
@@ -129,7 +132,8 @@ fun HomeScreen(
                 onClick = onNavigateToAERP,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(56.dp)
+                    .bounceClick(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color(0xFF1976D2)
