@@ -2,8 +2,25 @@ package com.kkwieer.erpwebapp.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +39,8 @@ import com.kkwieer.erpwebapp.ui.bounceClick
 fun HomeScreen(
     onNavigateToLMS: () -> Unit,
     onNavigateToMobileAppDev: () -> Unit,
-    onNavigateToAERP: () -> Unit
+    onNavigateToAERP: () -> Unit,
+    onNavigateToDeveloperInfo: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -149,6 +167,33 @@ fun HomeScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        // Small Developer Info Button - positioned at bottom right, very unobtrusive
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(
+                onClick = onNavigateToDeveloperInfo,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color.White.copy(alpha = 0.6f)
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Developer Info",
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Info",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
                 )
             }
         }

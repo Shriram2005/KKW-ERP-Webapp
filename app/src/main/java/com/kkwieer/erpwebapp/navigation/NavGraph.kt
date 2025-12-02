@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.kkwieer.erpwebapp.screens.DeveloperInfoScreen
 import com.kkwieer.erpwebapp.screens.HomeScreen
 import com.kkwieer.erpwebapp.screens.SplashScreen
 import com.kkwieer.erpwebapp.screens.WebViewScreen
@@ -36,6 +37,9 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onNavigateToAERP = {
                     navController.navigate(Screen.AERPLogin.route)
+                },
+                onNavigateToDeveloperInfo = {
+                    navController.navigate(Screen.DeveloperInfo.route)
                 }
             )
         }
@@ -67,6 +71,15 @@ fun NavGraph(navController: NavHostController) {
             WebViewScreen(
                 title = "AERP Login",
                 url = "https://aerp.kkwagh.edu.in",
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Developer Info Screen
+        composable(route = Screen.DeveloperInfo.route) {
+            DeveloperInfoScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

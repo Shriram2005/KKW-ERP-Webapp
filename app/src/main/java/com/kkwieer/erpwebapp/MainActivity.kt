@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,11 +16,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.kkwieer.erpwebapp.BuildConfig
 import com.kkwieer.erpwebapp.navigation.NavGraph
 import com.kkwieer.erpwebapp.navigation.Screen
 import com.kkwieer.erpwebapp.ui.theme.KKWIEERERPTheme
+import com.kkwieer.erpwebapp.update.UpdateChecker
+import com.kkwieer.erpwebapp.update.UpdateDialog
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -31,6 +36,30 @@ class MainActivity : ComponentActivity() {
                 var lastBackPressTimestamp by remember { mutableStateOf(0L) }
                 val context = LocalContext.current
                 val activity = context as? Activity
+
+                var showUpdateDialog by remember { mutableStateOf(false) }
+                var updateInfo by remember { mutableStateOf<UpdateChecker.UpdateInfo?>(null) }
+
+                LaunchedEffect(Unit) {
+                    UpdateChecker.checkForUpdate(BuildConfig.VERSION_NAME)?.let { info ->
+                        if (info.isUpdateAvailable) {
+                            updateInfo = info
+                            showUpdateDialog = true
+                        }
+                    }
+                }
+
+                updateInfo?.let { info ->
+                    if (showUpdateDialog) {
+                        UpdateDialog(
+                            currentVersion = BuildConfig.VERSION_NAME,
+                            latestVersion = info.latestVersion,
+                            releaseNotes = info.releaseNotes,
+                            releaseUrl = info.releaseUrl,
+                            onDismiss = { showUpdateDialog = false }
+                        )
+                    }
+                }
 
                 if (currentRoute == Screen.Home.route) {
                     BackHandler {
@@ -50,4 +79,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
