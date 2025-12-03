@@ -16,3 +16,4 @@ local.properties
 .idea
 /app/src/main/java/com/kkwieer/erpwebapp/TODO
 .idea/misc.xml
+app/release/

@@ -1,10 +1,8 @@
 package com.kkwieer.erpwebapp.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,17 +19,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +37,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -79,106 +76,180 @@ fun SettingsScreen(onNavigateBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "Manage Portal Links",
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
+                title = { Text("Manage Links") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { showResetDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Reset to defaults"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = PrimaryBlue,
                     titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    navigationIconContentColor = Color.White
                 )
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddDialog = true },
-                containerColor = PrimaryBlue,
-                contentColor = Color.White
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Link")
-            }
         }
     ) { paddingValues ->
-        Box(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
         ) {
-            if (links.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+            // Add New Link Button
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .clickable { showAddDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = PrimaryBlue.copy(alpha = 0.08f))
                 ) {
-                    Text(
-                        text = "No links added",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Tap + to add a new link",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
-                }
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    itemsIndexed(links, key = { _, link -> link.id }) { index, link ->
-                        LinkCard(
-                            link = link,
-                            index = index,
-                            totalCount = links.size,
-                            onEdit = { editingLink = link },
-                            onDelete = { showDeleteDialog = link },
-                            onMoveUp = {
-                                if (index > 0) {
-                                    repository.moveLink(index, index - 1)
-                                    refreshLinks()
-                                }
-                            },
-                            onMoveDown = {
-                                if (index < links.size - 1) {
-                                    repository.moveLink(index, index + 1)
-                                    refreshLinks()
-                                }
-                            }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null,
+                            tint = PrimaryBlue,
+                            modifier = Modifier.size(20.dp)
                         )
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(72.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Add New Link",
+                            color = PrimaryBlue,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 15.sp
+                        )
                     }
                 }
             }
+
+            // Links Section
+            if (links.isNotEmpty()) {
+                item {
+                    Text(
+                        text = "Your Links",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    ) {
+                        Column {
+                            links.forEachIndexed { index, link ->
+                                LinkItem(
+                                    link = link,
+                                    index = index,
+                                    totalCount = links.size,
+                                    onEdit = { editingLink = link },
+                                    onDelete = { showDeleteDialog = link },
+                                    onMoveUp = {
+                                        if (index > 0) {
+                                            repository.moveLink(index, index - 1)
+                                            refreshLinks()
+                                        }
+                                    },
+                                    onMoveDown = {
+                                        if (index < links.size - 1) {
+                                            repository.moveLink(index, index + 1)
+                                            refreshLinks()
+                                        }
+                                    }
+                                )
+                                if (index < links.size - 1) {
+                                    HorizontalDivider(
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No links yet",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Add a link to get started",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            }
+
+            // Reset Option
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .clickable { showResetDialog = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Outlined.Refresh,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Reset to Default Links",
+                                fontSize = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Restore original portal links",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
 
-    // Add/Edit Dialog
+    // Dialogs
     if (showAddDialog || editingLink != null) {
         LinkDialog(
             link = editingLink,
@@ -199,12 +270,11 @@ fun SettingsScreen(onNavigateBack: () -> Unit) {
         )
     }
 
-    // Reset Confirmation Dialog
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text("Reset to Defaults?") },
-            text = { Text("This will remove all custom links and restore the original portal links.") },
+            title = { Text("Reset Links?") },
+            text = { Text("This will remove all your links and restore the default portal links.") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -213,19 +283,14 @@ fun SettingsScreen(onNavigateBack: () -> Unit) {
                         showResetDialog = false
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
-                ) {
-                    Text("Reset")
-                }
+                ) { Text("Reset") }
             },
             dismissButton = {
-                OutlinedButton(onClick = { showResetDialog = false }) {
-                    Text("Cancel")
-                }
+                OutlinedButton(onClick = { showResetDialog = false }) { Text("Cancel") }
             }
         )
     }
 
-    // Delete Confirmation Dialog
     showDeleteDialog?.let { link ->
         AlertDialog(
             onDismissRequest = { showDeleteDialog = null },
@@ -239,21 +304,17 @@ fun SettingsScreen(onNavigateBack: () -> Unit) {
                         showDeleteDialog = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text("Delete")
-                }
+                ) { Text("Delete") }
             },
             dismissButton = {
-                OutlinedButton(onClick = { showDeleteDialog = null }) {
-                    Text("Cancel")
-                }
+                OutlinedButton(onClick = { showDeleteDialog = null }) { Text("Cancel") }
             }
         )
     }
 }
 
 @Composable
-private fun LinkCard(
+private fun LinkItem(
     link: PortalLink,
     index: Int,
     totalCount: Int,
@@ -262,120 +323,107 @@ private fun LinkCard(
     onMoveUp: () -> Unit,
     onMoveDown: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = link.name,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        if (link.isDefault) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = PrimaryBlue.copy(alpha = 0.1f)
-                                ),
-                                shape = RoundedCornerShape(4.dp)
-                            ) {
-                                Text(
-                                    text = "Default",
-                                    fontSize = 10.sp,
-                                    color = PrimaryBlue,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = link.url,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+    var showMenu by remember { mutableStateOf(false) }
 
-                // Reorder buttons
-                Column {
-                    IconButton(
-                        onClick = onMoveUp,
-                        enabled = index > 0,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowUp,
-                            contentDescription = "Move Up",
-                            tint = if (index > 0) PrimaryBlue else Color.Gray.copy(alpha = 0.3f)
-                        )
-                    }
-                    IconButton(
-                        onClick = onMoveDown,
-                        enabled = index < totalCount - 1,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Move Down",
-                            tint = if (index < totalCount - 1) PrimaryBlue else Color.Gray.copy(
-                                alpha = 0.3f
-                            )
-                        )
-                    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onEdit() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Link number indicator
+        Text(
+            text = "${index + 1}",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = PrimaryBlue,
+            modifier = Modifier.width(24.dp)
+        )
+
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = link.name,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+                if (link.isDefault) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Default",
+                        fontSize = 11.sp,
+                        color = PrimaryBlue.copy(alpha = 0.7f)
+                    )
                 }
             }
+            Text(
+                text = link.url,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
 
-            Spacer(modifier = Modifier.height(12.dp))
+        // Menu button
+        IconButton(
+            onClick = { showMenu = true },
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = "Options",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
             ) {
-                TextButton(onClick = onEdit) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                DropdownMenuItem(
+                    text = { Text("Edit") },
+                    onClick = {
+                        showMenu = false
+                        onEdit()
+                    }
+                )
+                if (index > 0) {
+                    DropdownMenuItem(
+                        text = { Text("Move Up") },
+                        onClick = {
+                            showMenu = false
+                            onMoveUp()
+                        }
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Edit")
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                TextButton(
-                    onClick = onDelete,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
+                if (index < totalCount - 1) {
+                    DropdownMenuItem(
+                        text = { Text("Move Down") },
+                        onClick = {
+                            showMenu = false
+                            onMoveDown()
+                        }
                     )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Delete")
                 }
+                DropdownMenuItem(
+                    text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    },
+                    onClick = {
+                        showMenu = false
+                        onDelete()
+                    }
+                )
             }
         }
     }
@@ -393,54 +441,34 @@ private fun LinkDialog(
     var urlError by remember { mutableStateOf<String?>(null) }
 
     fun validate(): Boolean {
-        var isValid = true
-        if (name.isBlank()) {
-            nameError = "Name is required"
-            isValid = false
-        } else {
-            nameError = null
+        nameError = if (name.isBlank()) "Name is required" else null
+        urlError = when {
+            url.isBlank() -> "URL is required"
+            !url.startsWith("http://") && !url.startsWith("https://") -> "URL must start with http:// or https://"
+            else -> null
         }
-        if (url.isBlank()) {
-            urlError = "URL is required"
-            isValid = false
-        } else if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            urlError = "URL must start with http:// or https://"
-            isValid = false
-        } else {
-            urlError = null
-        }
-        return isValid
+        return nameError == null && urlError == null
     }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = {
-            Text(if (link == null) "Add New Link" else "Edit Link")
-        },
+        title = { Text(if (link == null) "Add Link" else "Edit Link") },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = {
-                        name = it
-                        nameError = null
-                    },
-                    label = { Text("Link Name") },
-                    placeholder = { Text("e.g., My Portal") },
+                    onValueChange = { name = it; nameError = null },
+                    label = { Text("Name") },
+                    placeholder = { Text("My Portal") },
                     isError = nameError != null,
                     supportingText = nameError?.let { { Text(it) } },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
+                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = url,
-                    onValueChange = {
-                        url = it
-                        urlError = null
-                    },
+                    onValueChange = { url = it; urlError = null },
                     label = { Text("URL") },
                     placeholder = { Text("https://example.com") },
                     isError = urlError != null,
@@ -453,20 +481,12 @@ private fun LinkDialog(
         },
         confirmButton = {
             Button(
-                onClick = {
-                    if (validate()) {
-                        onSave(name.trim(), url.trim())
-                    }
-                },
+                onClick = { if (validate()) onSave(name.trim(), url.trim()) },
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
-            ) {
-                Text("Save")
-            }
+            ) { Text("Save") }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
+            OutlinedButton(onClick = onDismiss) { Text("Cancel") }
         }
     )
 }

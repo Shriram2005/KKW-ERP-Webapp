@@ -31,6 +31,12 @@
 -keep class com.kkwieer.erpwebapp.update.UpdateChecker$UpdateInfo { *; }
 
 # ============================================
+# Data Classes (JSON Serialization)
+# ============================================
+-keep class com.kkwieer.erpwebapp.data.PortalLink { *; }
+-keep class com.kkwieer.erpwebapp.data.PortalLink$Companion { *; }
+
+# ============================================
 # Kotlin
 # ============================================
 -dontwarn kotlin.**
