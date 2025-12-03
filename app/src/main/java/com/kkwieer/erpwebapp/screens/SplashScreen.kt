@@ -60,6 +60,7 @@ fun SplashScreen(onNavigateToHome: () -> Unit) {
                     painter = painterResource(id = R.drawable.college_logo),
                     contentDescription = "College Logo",
                     modifier = Modifier.size(160.dp)
+                        .padding(12.dp)
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
