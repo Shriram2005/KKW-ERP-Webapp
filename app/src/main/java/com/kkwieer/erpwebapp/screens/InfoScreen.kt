@@ -2,7 +2,9 @@ package com.kkwieer.erpwebapp.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,16 +35,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kkwieer.erpwebapp.BuildConfig
+import com.kkwieer.erpwebapp.R
 
 private val PrimaryBlue = Color(0xFF1976D2)
 
@@ -50,6 +58,7 @@ private val PrimaryBlue = Color(0xFF1976D2)
 @Composable
 fun DeveloperInfoScreen(onNavigateBack: () -> Unit) {
     val context = LocalContext.current
+    var showDeveloperDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -86,19 +95,20 @@ fun DeveloperInfoScreen(onNavigateBack: () -> Unit) {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // App Icon
+            // App Icon / KKW Image
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .background(PrimaryBlue),
+                    .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "KKW",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                Image(
+                    painter = painterResource(id = R.drawable.college_logo),
+                    contentDescription = "KKW Logo",
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxSize()
                 )
             }
 
@@ -164,18 +174,43 @@ fun DeveloperInfoScreen(onNavigateBack: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = "Shriram Mange",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Text(
-                        text = "MCA Student",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { showDeveloperDialog = true },
+                        colors = CardDefaults.cardColors(
+                            containerColor = PrimaryBlue.copy(alpha = 0.04f)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Shriram Mange",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = "MCA Student · Android & Web Developer",
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = "View developer profile",
+                                tint = PrimaryBlue
+                            )
+                        }
+                    }
                 }
             }
 
@@ -262,6 +297,88 @@ fun DeveloperInfoScreen(onNavigateBack: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+
+    if (showDeveloperDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeveloperDialog = false },
+            confirmButton = {},
+            title = {
+                Text(
+                    text = "Developer",
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Shriram Mange",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "MCA Student at KKWIEER",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Profiles",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LinkItem(
+                        title = "GitHub",
+                        subtitle = "github.com/Shriram2005",
+                        onClick = {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://github.com/Shriram2005")
+                            )
+                            context.startActivity(intent)
+                            showDeveloperDialog = false
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    LinkItem(
+                        title = "LinkedIn",
+                        subtitle = "linkedin.com/in/shriram-mange",
+                        onClick = {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://www.linkedin.com/in/shriram-mange")
+                            )
+                            context.startActivity(intent)
+                            showDeveloperDialog = false
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    LinkItem(
+                        title = "Website",
+                        subtitle = "shrirammange.tech",
+                        onClick = {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://shrirammange.tech")
+                            )
+                            context.startActivity(intent)
+                            showDeveloperDialog = false
+                        }
+                    )
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -273,6 +390,8 @@ private fun LinkItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -290,12 +409,10 @@ private fun LinkItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        IconButton(onClick = onClick) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Open",
-                tint = PrimaryBlue
-            )
-        }
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = "Open",
+            tint = PrimaryBlue
+        )
     }
 }
