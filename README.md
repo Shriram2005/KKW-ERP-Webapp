@@ -1,43 +1,61 @@
-# KKW ERP Portal App
+# 📱 KKW Multi-Portal Access App
 
-A simple Android application built with Kotlin and Jetpack Compose that provides quick access to
-three educational portals.
+A lightweight Android app designed to provide **one-tap access** to all major KKW student portals such as **LMS**, **AERP**, and the **Mobile App Development Course Site**.  
+Instead of typing URLs or searching bookmarks every day, this app lets students and staff quickly open all portals through a clean WebView interface.
 
-## Features
+---
 
-- Splash Screen with college logo
-- Home Screen with three portal navigation buttons
-- WebView screens with desktop/mobile mode toggle
-- Pull-to-refresh and refresh button
-- Keyboard shortcuts (F5, Ctrl+R) for refresh
-- Developer info page
-- Material Design 3 UI
+## 🚀 Features
 
-## Portals
+- ⚡ **Instant access** to:
+  - LMS Portal  
+  - Mobile App Development Course Site  
+  - AERP Portal  
+- ➕ **Add your own custom URLs** for quick access  
+- 🎨 Clean and minimal UI  
+- 📱 Dedicated screens for each portal  
+- 🔗 Fast WebView loading  
+- 🧭 Smooth navigation using Jetpack Compose  
 
-1. **LMS Portal** - Learning Management System
-2. **Mobile App Development Course** - Online learning platform
-3. **AERP Login** - Academic ERP system
+---
 
-## Technical Stack
+## 📘 How to Use
 
-- **Language**: Kotlin
-- **UI**: Jetpack Compose
-- **Navigation**: Jetpack Compose Navigation
-- **Min SDK**: 26 (Android 8.0)
-- **Target SDK**: 36
+1. Install the APK on your Android device  
+2. Open the app  
+3. Tap the portal you want to access  
+4. Log in and continue working — no browser required  
+5. Add your own custom links if needed  
 
-## How to Build
+---
 
-1. Clone the repository
-2. Open in Android Studio
-3. Sync Gradle files
-4. Build and run
+## 🛠️ Tech Stack
 
-```bash
-./gradlew assembleDebug
-```
+- **Kotlin**
+- **Jetpack Compose**
+- **Android SDK**
+- **WebView**
+- **Gradle**
 
-## License
+---
 
-Created for educational purposes for KKW Institution.
+## 📲 Download APK
+
+Download the latest version of the app here:
+
+👉 **[Download App (.apk)](https://github.com/Shriram2005/KKW-ERP-Webapp/releases)**
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!  
+Feel free to open a **Pull Request** or issue in the repository.
+
+---
+
+## 🧑‍💻 Developer
+
+**Shriram Mange**  
+MCA Student | Android Developer  
+📍 Nashik, Maharashtra
